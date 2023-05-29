@@ -1,9 +1,10 @@
 import requests
+from requests.auth import HTTPBasicAuth
 from datetime import datetime
+import os
 
-APP_ID = "1b931bd5"
-API_KEY = "2c4d00aab20f4cb2d9e470f27d1a83e2"
-USERNAME = "6c0887c27fe16c2892977f767bcbbd82"
+APP_ID = os.environ["APP_ID"]
+API_KEY = os.environ['API_KEY']
 
 exercises_done = input("Tell me which exercises you did: ")
 current_datetime = datetime.now()
@@ -23,7 +24,12 @@ exercise_params = {
 res = requests.post(url=exercise_endpoint, json=exercise_params, headers=headers)
 exercise_data = res.json()
 
-sheety_endpoint = f"https://api.sheety.co/{USERNAME}/workoutTracking/workouts"
+SHEETY_ENDPOINT = os.environ["SHEETY_ENDPOINT"]
+
+USERNAME = os.environ["USERNAME"]
+PASS = os.environ["PASS"]
+
+basic = HTTPBasicAuth(USERNAME, PASS)
 
 for exercise in exercise_data['exercises']:
     sheety_params = {
@@ -36,5 +42,5 @@ for exercise in exercise_data['exercises']:
         }
     }
 
-    exercise_res = requests.post(url=sheety_endpoint, json=sheety_params)
+    exercise_res = requests.post(url=SHEETY_ENDPOINT, json=sheety_params, auth=basic)
     print(exercise_res.text)
